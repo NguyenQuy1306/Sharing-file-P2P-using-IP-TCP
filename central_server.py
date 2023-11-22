@@ -18,11 +18,12 @@ class ClientFilesList(customtkinter.CTkToplevel):
     def __init__(self, master, username, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.username = username
+        self.title("View")
         self.geometry("550x290")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         
-        self.scrollable_files_frame = customtkinter.CTkScrollableFrame(self, label_text="List of Files")
+        self.scrollable_files_frame = customtkinter.CTkScrollableFrame(self, label_text="Danh sách files",label_text_color="#3F72AF",label_font=("Danh sách files",25))
         self.scrollable_files_frame.grid(row=0, column=0, rowspan=4, padx=(10, 0), pady=(10, 0), sticky="nsew")
         
         self.scrollable_clients_files = get_user_file(self.username)
@@ -55,7 +56,7 @@ class App(customtkinter.CTk):
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
-        self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655")
+        self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655",font=customtkinter.CTkFont(size=15, weight="bold"))
         self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
 
         # change appearance mode
@@ -75,7 +76,7 @@ class App(customtkinter.CTk):
         # create scrollable frame for clients list
         ## to do: add clients to this frame
         self.scrollable_clients_frame = customtkinter.CTkScrollableFrame(self, label_text="Clients",fg_color="#DBE2EF",label_text_color="#3F72AF",label_font=("Clients",25))
-        self.scrollable_clients_frame.grid(row = 0, column = 1, columnspan = 2, rowspan=3, padx=(10, 0), pady=(10, 0), sticky="nsew")
+        self.scrollable_clients_frame.grid(row = 0, column = 1, columnspan = 2, rowspan=3, padx=(10, 10), pady=(10, 0), sticky="nsew")
         self.scrollable_clients_frame.grid_columnconfigure((0), weight=1)
         self.scrollable_clients_names = get_all_users()
         self.scrollable_clients_labels = []
