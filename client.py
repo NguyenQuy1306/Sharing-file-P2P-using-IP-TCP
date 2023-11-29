@@ -564,23 +564,37 @@ class NetworkPeer(Base):
     ## ===========================================================##
 
     ## ==========implement protocol for getting online user list who have file that client find==========##
+    def file_not_found_notification(self, filename):
+        """Notify the user that the file was not found."""
+        display_noti('Thông báo', f'File "{filename}" không tồn tại.')
+        print(f'File "{filename}" not found.')
+
+    # Modify your existing send_listpeer function to call file_not_found_notification
     def send_listpeer(self, filename):
-        """ Send a request to server to get all online peers who have file that client find. """
+        """Send a request to the server to get all online peers who have the file that the client is searching for."""
+        self.filename = filename  # Set the filename attribute in the class
         peer_info = {
             'peername': self.name,
             'host': self.serverhost,
             'port': self.serverport,
             'filename': filename
         }
-        self.client_send(self.server_info,
-                         msgtype='PEER_SEARCH', msgdata=peer_info)
-        
+        self.client_send(self.server_info, msgtype='PEER_SEARCH', msgdata=peer_info)
+
+
+    # Modify your get_users_share_file function to check if the list is empty and call file_not_found_notification
     def get_users_share_file(self, msgdata):
-        shareList = msgdata['online_user_list_have_file']
+        shareList = msgdata.get('online_user_list_have_file', {})
+        
+        if not shareList:
+            self.file_not_found_notification(self.filename)
+            return
+
         for peername, data in shareList.items():
             peer_host, peer_port = data
-            info = str(peer_host) + "," + str(peer_port)
+            info = f"{peer_host},{peer_port}"
             app.frames[RepoPage].peerListBox.insert(0, info)
+
 
     def reloadRepoList(self):
         fileList = []
