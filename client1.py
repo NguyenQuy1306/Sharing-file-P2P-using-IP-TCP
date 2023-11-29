@@ -465,7 +465,7 @@ class RepoPage(tk.Frame):
     def sidebar_button_event(self):
         print("huhu")
 
-    def listbox_callback():
+    def listbox_callback(self):
         print("done")
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
@@ -776,22 +776,26 @@ class NetworkPeer(Base):
             localRepo_path = os.path.join(os.getcwd(), "localRepo1")
             file_path = os.path.join(localRepo_path, file_name)
 
-            with open(file_name, "wb") as f:
+            # Open the file with the correct path for writing binary data
+            with open(file_path, "wb") as f:
                 while True:
                     bytes_read = conn.recv(BUFFER_SIZE)
-                    if not bytes_read:    
-                        # nothing is received
-                        # file transmitting is done
+                    if not bytes_read:
+                        # Nothing is received, file transmitting is done
                         break
-                    # write to the file the bytes we just received
+                    # Write to the file the bytes we just received
                     f.write(bytes_read)
-            
+
+            # Update the file list in your application (you may need to implement this method)
             app.frames[RepoPage].updateListFilefromFetch(file_name, recv_file_info['filenameserver'])
+
+            # Shutdown and close the connection
             conn.shutdown(socket.SHUT_WR)
             conn.close()
 
-            display_noti("File Transfer Result", 'You receive a file with name ' + file_name + ' from ' + friend_name)
-    
+            # Display a notification
+            display_noti("File Transfer Result", f'You received a file with name {file_name} from {friend_name}')
+
     ## ===========================================================##
     
     ## ==========implement protocol for log out & exit ===================##
