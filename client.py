@@ -411,13 +411,13 @@ class RepoPage(tk.Frame):
             # popup = simpledialog.askstring("Input","Nhập tên file trên Localrepo",parent = self)
             self.fileListBox.insert(0,file_name)
             tkinter.messagebox.showinfo(
-                "Local Repository", '{} has been added to localrepo!'.format(file_name))
+                "Local Repository", '{} has been added to localRepo!'.format(file_name))
             self.sendtoLocalPath(file_name)
             
     def chooseFilefromPath(self, file_path):
             self.fileListBox.insert(0,file_path)
             tkinter.messagebox.showinfo(
-                "Local Repository", '{} has been added to localrepo!'.format(file_path))
+                "Local Repository", '{} has been added to localRepo!'.format(file_path))
             
     def fileRequest(self):
         peer_info = self.peerListBox.get(tk.ANCHOR)
@@ -465,7 +465,7 @@ class RepoPage(tk.Frame):
     def sidebar_button_event(self):
         print("huhu")
 
-    def listbox_callback():
+    def listbox_callback(self):
         print("done")
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
@@ -716,7 +716,7 @@ class NetworkPeer(Base):
             file_name = os.path.basename(file_path)
             def fileThread(filename):
                 file_sent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                file_sent.connect((peer_info[0], peer_info[1]+OFFSET))
+                file_sent.connect((peer_info[0], peer_info[1] + OFFSET))
 
                 # send filename and friendname
                 fileInfo = {
@@ -727,18 +727,24 @@ class NetworkPeer(Base):
 
                 fileInfo = json.dumps(fileInfo).encode(FORMAT)
                 file_sent.send(fileInfo)
-                
+
                 msg = file_sent.recv(BUFFER_SIZE).decode(FORMAT)
                 print(msg)
 
-                with open(file_path, "rb") as f:
+                # Change the path to localRepo
+                localRepo_path = os.path.join(os.getcwd(), "localRepo")
+                file_path = os.path.join(localRepo_path, filename)
+
+                # Receive and save the file
+                with open(file_path, "wb") as f:
                     while True:
-                        # read the bytes from the file
-                        bytes_read = f.read(BUFFER_SIZE)
+                        bytes_read = file_sent.recv(BUFFER_SIZE)
                         if not bytes_read:
+                            # Nothing is received, file transmission is done
                             break
-                        file_sent.sendall(bytes_read)
-                file_sent.shutdown(socket.SHUT_WR)
+                        f.write(bytes_read)
+
+                # Close the file socket
                 file_sent.close()
                 display_noti("File Transfer Result", 'File has been sent!')
                 return
@@ -767,22 +773,29 @@ class NetworkPeer(Base):
             file_name = recv_file_info['filename']
             friend_name = recv_file_info['friendname']
 
-            with open(file_name, "wb") as f:
+            localRepo_path = os.path.join(os.getcwd(), "localRepo")
+            file_path = os.path.join(localRepo_path, file_name)
+
+            # Open the file with the correct path for writing binary data
+            with open(file_path, "wb") as f:
                 while True:
                     bytes_read = conn.recv(BUFFER_SIZE)
-                    if not bytes_read:    
-                        # nothing is received
-                        # file transmitting is done
+                    if not bytes_read:
+                        # Nothing is received, file transmitting is done
                         break
-                    # write to the file the bytes we just received
+                    # Write to the file the bytes we just received
                     f.write(bytes_read)
-            
+
+            # Update the file list in your application (you may need to implement this method)
             app.frames[RepoPage].updateListFilefromFetch(file_name, recv_file_info['filenameserver'])
+
+            # Shutdown and close the connection
             conn.shutdown(socket.SHUT_WR)
             conn.close()
 
-            display_noti("File Transfer Result", 'You receive a file with name ' + file_name + ' from ' + friend_name)
-    
+            # Display a notification
+            display_noti("File Transfer Result", f'You received a file with name {file_name} from {friend_name}')
+
     ## ===========================================================##
     
     ## ==========implement protocol for log out & exit ===================##
