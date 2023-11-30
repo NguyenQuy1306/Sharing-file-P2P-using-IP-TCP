@@ -4,6 +4,7 @@ from Base import Base
 from persistence import *
 import customtkinter
 import tkinter.messagebox
+from tkinter import ttk
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
@@ -33,6 +34,25 @@ class ClientFilesList(customtkinter.CTkToplevel):
             client_label.grid(row=i, column=0, padx=10, pady=(0, 20))
             self.scrollable_clients_files_labels.append(client_label)
 
+class PlaceholderEntry(ttk.Entry):
+    def __init__(self, master=None, placeholder="", *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+
+        self.placeholder = placeholder
+        self.insert("0", self.placeholder)
+
+        self.bind("<FocusIn>", self.on_entry_click)
+        self.bind("<FocusOut>", self.on_focus_out)
+
+    def on_entry_click(self, event):
+        if self.get() == self.placeholder:
+            self.delete(0, "end")
+            self.config(foreground='black')  # Change text color when typing
+
+    def on_focus_out(self, event):
+        if not self.get():
+            self.insert("0", self.placeholder)
+            self.config(foreground='gray')  # Change text color when placeholder is shown
 class App(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,20 +64,21 @@ class App(customtkinter.CTk):
         self.geometry(f"{1100}x{580}")
         self.configure(bg="red")
         # configure grid layout (3x?)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure((1), weight=1)
-        self.grid_rowconfigure(1, weight=1)
+        
 
         # create sidebar frame with widgets
-        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=10,fg_color="#DBE2EF")
-        self.sidebar_frame.grid(row=0, column=0, rowspan=1,  padx=(10,0),pady=(10,0),sticky="nsew"),
-        self.sidebar_frame.grid_rowconfigure(1, weight=1)
-
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-
-        self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655",font=customtkinter.CTkFont(size=15, weight="bold"))
-        self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
+        self.sidebar_frame = ttk.Label(self, width=140, text="P2P server",font=('Arial', 25),foreground="#3F72AF")  
+        self.sidebar_frame.grid(column=0, row=0, sticky=tkinter.W, padx=5, pady=5)
+        # self.sidebar_frame.grid(row=0, column=0, rowspan=1,  padx=(10,0),pady=(10,0),sticky="nsew"),
+        # self.sidebar_frame.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure((1), weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        # self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"),anchor="center")
+        # self.logo_label.grid(row=0, column=0, padx=(240,20), pady=(20, 10),sticky="nsew", columnspan=2, rowspan=2)
+        
+        #self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655",font=customtkinter.CTkFont(size=15, weight="bold"))
+        #self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
 
         # change appearance mode
         # self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
@@ -76,7 +97,7 @@ class App(customtkinter.CTk):
         # create scrollable frame for clients list
         ## to do: add clients to this frame
         self.scrollable_clients_frame = customtkinter.CTkScrollableFrame(self, label_text="Clients",fg_color="#DBE2EF",label_text_color="#3F72AF",label_font=("Clients",25))
-        self.scrollable_clients_frame.grid(row = 0, column = 1, columnspan = 2, rowspan=3, padx=(10, 10), pady=(10, 0), sticky="nsew")
+        self.scrollable_clients_frame.grid(row = 1, column = 0, columnspan = 2, rowspan=4, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.scrollable_clients_frame.grid_columnconfigure((0), weight=1)
         self.scrollable_clients_names = get_all_users()
         self.scrollable_clients_labels = []
@@ -96,11 +117,15 @@ class App(customtkinter.CTk):
         # create CLI
 
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
-        self.entry.grid_columnconfigure((0), weight=1)
-        self.entry.grid(row=3, column=1, padx=(10, 10), pady=(20, 20), sticky="nsew")
+        self.entry.grid_columnconfigure(0, weight=0)
+        self.entry.grid(row=2, column=2, padx=(10, 10), pady=(20, 0))
+        # login_button = ttk.Entry(self, placeholder_text="Command...")
+        # login_button.grid(column=0, row=5, sticky=tkinter.W, padx=5, pady=5)
         self.main_button_1 = customtkinter.CTkButton(master=self, text="Enter", command = lambda:self.commandLine(command = self.entry.get()), fg_color="#192655", border_width=2)
-        self.main_button_1.grid(row=3, column=2, padx=(10, 10), pady=(20, 20), sticky="nsew")
-
+        self.main_button_1.grid(row=3, column=2, padx=(10, 10), pady=(10, 0), sticky="nsew")
+        self.main_button_2 = customtkinter.CTkButton(master=self, text="Thoát", command=self.sidebar_button_event, fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
+        self.main_button_2.grid(row=4, column=2, padx=(10, 10), pady=(10, 20), sticky="nsew")
+        
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
@@ -110,7 +135,7 @@ class App(customtkinter.CTk):
 
     ## to do: stop server
     def sidebar_button_event(self):
-        print("huhu")
+        app.destroy()
 
     def commandLine(self, command):
         parts = command.split()
@@ -174,7 +199,7 @@ class CentralServer(Base):
 
         # Delete data in table online
         delete_all_onl_users()
-
+        
         # define handlers for received message of central server
         handlers = {
             'PEER_REGISTER': self.peer_register,
@@ -278,6 +303,7 @@ class CentralServer(Base):
             remove_onl_user(peer_name)
             # noti
             print(peer_name, " has been removed from central server's online user list!")
+            display_noti(peer_name," logout")
     ## ===========================================================##
 
     ## ================implement protocol for peer upload file=============##
@@ -294,6 +320,7 @@ class CentralServer(Base):
         peer_name = msgdata['peername']
         file_name = msgdata['filename']
         delete_file(peer_name, file_name)
+
 
 app = App()
 app.title('P2P File Sharing')
