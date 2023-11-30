@@ -174,7 +174,6 @@ class LoginPage(tk.Frame):
         # loginImg = tkinter.Label(self, image=login_pic)
         # loginImg.image = login_pic
         # loginImg.place(x=50, y=50)
-
         self.frame = customtkinter.CTkFrame(master=self, fg_color="white")
         self.frame.pack(fill='both', expand=True)
 
@@ -195,7 +194,7 @@ class LoginPage(tk.Frame):
                                 self.login_user(username=self.username_entry.get(), password=self.password_entry.get())).pack(pady=(0, 10),padx=10)
         customtkinter.CTkLabel(self.frame, text="Bạn không có tài khoản ?", font=("Roboto", 11)).pack(pady=(10, 0),padx=10)
         customtkinter.CTkButton(self.frame, text='Đăng ký', font=customtkinter.CTkFont(size=12, weight="bold"),fg_color="#192655", cursor="hand2", command=lambda: controller.show_frame(RegisterPage)).pack(pady=(0, 10),padx=10)
-
+    
     def login_user(self, username, password):
         network_peer.name = str(username)
         # hash password by MD5 algorithm
@@ -209,127 +208,80 @@ class RepoPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
-        
-        # configure grid layout (3x?)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure((1, 2), weight=1)
+
+        self.grid_columnconfigure(0, weight=1)
+        # self.grid_columnconfigure((1, 2), weight=1)
         self.grid_rowconfigure(( 1), weight=1)
-
-        # create sidebar frame with widgets
-        # start of sidebar
-        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=10,fg_color="#DBE2EF")
-        self.sidebar_frame.grid(row=0, column=0, rowspan=1,padx=(10,10),pady=(10,10), sticky="nsew",)
-        self.sidebar_frame.grid_rowconfigure(4, weight=1)
-
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-
-        self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát",font=customtkinter.CTkFont(size=12, weight="bold"), command=lambda: self.quit_user(),fg_color="#192655")
-        self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
-
-        # sidebar buttons
-        # self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Quit", command=lambda: self.quit_user())
-        # self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
-        self.logout_button = customtkinter.CTkButton(self.sidebar_frame, text="Đăng xuất", font=customtkinter.CTkFont(size=12, weight="bold"),fg_color="#192655",command=lambda: self.logout_user())
-        self.logout_button.grid(row=2, column=0, padx=20, pady=10)
-        # change appearance mode
-        # self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
-        # self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        # self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
-        #                                                                command=self.change_appearance_mode_event)
-        # self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-        # # change scaling
-        # self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        # self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        # self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
-        #                                                        command=self.change_scaling_event)
-        # self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
-        # end of sidebar
 
         #### create frame for repo
         self.repo_frame = customtkinter.CTkFrame(self, fg_color="#DBE2EF",corner_radius=10)
-        self.repo_frame.grid(row=0, column=1, rowspan=4, sticky="nsew",pady=(10,10))
+        self.repo_frame.grid(row=0, column=3, sticky="nsew",pady=(10,10),padx=(10, 10))
         self.repo_frame.grid_rowconfigure(0, weight=1)
         self.repo_frame.grid_columnconfigure(0, weight=1)
         # create scrollable frame for repo list
         ## to do: add file names to this frame
-        self.scrollable_repo_frame = customtkinter.CTkScrollableFrame(self.repo_frame, label_text="Repository",label_text_color="#3F72AF")
-        self.scrollable_repo_frame.grid(row=0, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.scrollable_repo_frame = customtkinter.CTkScrollableFrame(self, label_text="Repository",label_text_color="#3F72AF",fg_color="#DBE2EF")
+        self.scrollable_repo_frame.grid(row=0, column=0,columnspan=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.scrollable_repo_frame.grid_rowconfigure(0, weight=1)
         self.scrollable_file_names = []
-        self.fileListBox = tk.Listbox(self.scrollable_repo_frame, width=75, height=20)
-        self.fileListBox.grid(row=0, column=0, padx=10, pady=(10, 10))
-        ## to do: modify range to number of current files
-        # for i in range(100):
-        #     file = customtkinter.CTkLabel(master=self.scrollable_repo_frame, text="File's Name")
-        #     file.grid(row=i, column=0, padx=10, pady=(0, 20))
-        #     self.scrollable_file_names.append(file)
-        # create listbox
-        # repo_items = ["hehe", "huhu", "hihi"] ##### to be replaced with scrollable_peer_names after adding to list
-        # self.repo_list = customtkinter.CTkComboBox(self.repo_frame, values=repo_items, command=self.listbox_callback)
-        # self.repo_list.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        # create repo buttons
+        self.fileListBox = tk.Listbox(self.scrollable_repo_frame, width=145, height=20)
+        self.fileListBox.grid(row=0, column=0, padx=10,columnspan=3, pady=(10, 10))
+
         # create temp frame
         self.temp_frame = customtkinter.CTkFrame(master=self.repo_frame, fg_color="transparent")
-        self.temp_frame.grid(row=2, column=0, sticky="nsew")
-        self.temp_frame.grid_rowconfigure(0, weight=1)
-        self.temp_frame.grid_columnconfigure(0, weight=1)
-        self.temp_frame.grid_columnconfigure(1, weight=1)
+        self.temp_frame.grid(row=0, column=1, sticky="nsew")
+        # self.temp_frame.grid_rowconfigure(0, weight=1)
+        # self.temp_frame.grid_columnconfigure(0, weight=1)
+        # self.temp_frame.grid_columnconfigure(1, weight=1)
         # create delete button
         self.delete_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Xóa file", fg_color="#192655",command=lambda: self.deleteSelectedFile())
-        self.delete_button.grid(row=0, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.delete_button.grid(row=0, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         # create choose file button 
         self.add_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Tải file lên repository",fg_color="#192655", command=lambda: self.chooseFile())
-        self.add_button.grid(row=0, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.add_button.grid(row=1, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         # create update to server button
-        self.update_button = customtkinter.CTkButton(master=self.repo_frame, border_width=2, text="Cập nhật Server", fg_color="#192655",command=lambda: self.updateListFile())
-        self.update_button.grid(row=3, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Cập nhật Server", fg_color="#192655",command=lambda: self.updateListFile())
+        self.update_button.grid(row=2, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         # create reload repo button
-        self.update_button = customtkinter.CTkButton(master=self.repo_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
-        self.update_button.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
+        self.update_button.grid(row=3, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
-        ### create frame for peer list
+
+        ####
+
         self.peer_frame = customtkinter.CTkFrame(self, fg_color="#DBE2EF",corner_radius=10)
-        self.peer_frame.grid(row=0, column=2, columnspan = 2, rowspan=3, sticky="nsew",padx=(10,10),pady=(10,10))
-        self.peer_frame.grid_rowconfigure(0, weight=1)
-        self.peer_frame.grid_columnconfigure(0, weight=1)
-        # create scrollable peer list
-        ## to do: add peer names to this frame
-        self.scrollable_peer_frame = customtkinter.CTkScrollableFrame(self.peer_frame, label_text="Peer List",label_text_color="#3F72AF")
-        self.scrollable_peer_frame.grid(row=0, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.peer_frame.grid(row=2, column=3,sticky="nsew",padx=(10,10),pady=(10,10))
+        self.peer_frame.grid_rowconfigure(1, weight=1)
+        self.peer_frame.grid_columnconfigure(1, weight=1)   
+        # # ###
+        self.scrollable_peer_frame = customtkinter.CTkScrollableFrame(self, label_text="Peer List",label_text_color="#3F72AF",fg_color="#DBE2EF")
+        self.scrollable_peer_frame.grid(row=2, column=0,columnspan=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.scrollable_peer_frame.grid_rowconfigure(0, weight=1)
         self.scrollable_peer_names = []
-        self.peerListBox = tk.Listbox(self.scrollable_peer_frame, width=75, height=20)
-        self.peerListBox.grid(row=0, column=0, padx=10, pady=(10, 10))
-        # to do: modify range to number of current peers
-        # for i in range(100):
-        #     peer = customtkinter.CTkLabel(master=self.scrollable_peer_frame, text="Peer's Name")
-        #     peer.grid(row=i, column=0, padx=10, pady=(0, 20))
-        #     self.scrollable_peer_names.append(peer)
-        # # create listbox
-        # list_items = ["hehe", "huhu", "hihi"] ##### to be replaced with scrollable_peer_names after adding to list
-        # self.list_box = customtkinter.CTkComboBox(self.peer_frame, values=list_items, command=self.listbox_callback)
-        # self.list_box.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        # create search for file
-        self.search_frame = customtkinter.CTkFrame(self.peer_frame, fg_color="#DBE2EF")
-        self.search_frame.grid(row=2, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        self.search_frame.grid_rowconfigure(0, weight=1)
-        self.search_frame.grid_columnconfigure(0, weight=1)
-        self.search_entry = customtkinter.CTkEntry(master=self.search_frame, placeholder_text="Search...")
-        self.search_entry.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
-        self.search_button = customtkinter.CTkButton(master=self.search_frame, text="Search", border_width=2, command=lambda: self.get_users_share_file_from_entry(),fg_color="#192655")
-        self.search_button.grid(row=0, column=1, padx=(10, 0), pady=0, sticky="nsew")
+        self.peerListBox = tk.Listbox(self.scrollable_peer_frame, width=175, height=20)
+        self.peerListBox.grid(row=0, column=1, padx=10, pady=(10, 10))
+        # # ####
+        #  29/11
+        # self.search_frame = customtkinter.CTkFrame(self.peer_frame, fg_color="#DBE2EF")
+        # self.search_frame.grid(row=2, column=6, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        # self.search_frame.grid_rowconfigure(0, weight=1)
+        # self.search_frame.grid_columnconfigure(0, weight=1)
+        self.search_entry = customtkinter.CTkEntry(master=self.peer_frame, placeholder_text="Search...")
+        self.search_entry.grid(row=4, column=2,padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.search_button = customtkinter.CTkButton(master=self.peer_frame, text="Search", border_width=2, command=lambda: self.get_users_share_file_from_entry(),fg_color="#192655")
+        self.search_button.grid(row=5, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         # create send connect request button
         self.request_button = customtkinter.CTkButton(master=self.peer_frame, border_width=2,
                                                      command=lambda:self.fileRequest(), text="Send Connect Request",fg_color="#192655")
-        self.request_button.grid(row=3, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.request_button.grid(row=6, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
-        # create CLI
+        #create CLI
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
-        self.entry.grid(row=4, column=1, columnspan=2, padx=(10, 10), pady=(20, 20), sticky="nsew")
-        self.main_button_1 = customtkinter.CTkButton(master=self, text="Enter",command=lambda:self.commandLine(command = self.entry.get()), border_width=2, fg_color="#192655")
-        self.main_button_1.grid(row=4, column=3, padx=(10, 10), pady=(20, 20), sticky="nsew")
-
+        self.entry.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
+        self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
+        self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
     def logout_user(self):
         network_peer.send_logout_request()
