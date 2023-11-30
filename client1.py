@@ -245,6 +245,10 @@ class RepoPage(tk.Frame):
         # create reload repo button
         self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
         self.update_button.grid(row=3, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        # Thêm một nhãn để hiển thị tên người dùng
+        self.greeting_label_var = tk.StringVar()
+        self.greeting_label = customtkinter.CTkLabel(master=self.temp_frame, textvariable=self.greeting_label_var, font=("Roboto", 14))
+        self.greeting_label.grid(row=4, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
 
         ####
@@ -272,7 +276,7 @@ class RepoPage(tk.Frame):
         self.search_button.grid(row=5, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
         # create send connect request button
         self.request_button = customtkinter.CTkButton(master=self.peer_frame, border_width=2,
-                                                     command=lambda:self.fileRequest(), text="Gửi yêu cầu kết nối",fg_color="#192655")
+                                                     command=lambda:self.fileRequest(), text="Send Connect Request",fg_color="#192655")
         self.request_button.grid(row=6, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
         #create CLI
@@ -282,6 +286,12 @@ class RepoPage(tk.Frame):
         self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
+
+    def update_user_greeting(self, username):
+        """Cập nhật nhãn chào mừng với tên người dùng."""
+        greeting = f"Xin chào, {username}!"
+        print(greeting)
+        self.greeting_label_var.set(greeting)
 
     def logout_user(self):
         network_peer.send_logout_request()
@@ -508,6 +518,7 @@ class NetworkPeer(Base):
         app.geometry("1100x600")
         app.resizable(False, False)
         app.show_frame(RepoPage)
+        app.frames[RepoPage].update_user_greeting(self.name)
 
     def login_error(self, msgdata):
         """ Processing received message from server: Login failed on the server. """
@@ -585,10 +596,8 @@ class NetworkPeer(Base):
         peername = msgdata['peername']
         host, port = msgdata['host'], msgdata['port']
         filename = msgdata['filename']
-        msg_box = tkinter.messagebox.askquestion('File Request', 'User: {} - host {}: port: {} yêu cầu gửi file "{}"?'.format(peername, host, port, filename),
+        msg_box = tkinter.messagebox.askquestion('File Request', '{} - {}:{} request to take the file "{}"?'.format(peername, host, port, filename),
                                             icon="question")
-        if msg_box == 'no':
-            self.client_send((host, port), msgtype='FILE_REFUSE', msgdata={})
         if msg_box == 'yes':
             # if request is agreed, connect to peer (add to friendlist)
             data = {
@@ -597,15 +606,15 @@ class NetworkPeer(Base):
                 'port': self.serverport
             }
             self.client_send((host, port), msgtype='FILE_ACCEPT', msgdata=data)
-            # display_noti("Yêu cầu file được chấp nhận.",
-            #              "Gửi file!")
+            display_noti("Yêu cầu file được chấp nhận.",
+                         "Gửi file!")
             self.friendlist[peername] = (host, port)
             destination = os.path.join(os.getcwd(), "serverRepo")
             file_path = tkinter.filedialog.askopenfilename(initialdir=destination,
                                                        title="Select a File",
                                                        filetypes=(("All files", "*.*"),))
             file_name = os.path.basename(file_path)
-            msg_box = tkinter.messagebox.askquestion('File Explorer', 'Bạn có chắc muốn gửi file {} đến user: {}?'.format(file_name, peername),
+            msg_box = tkinter.messagebox.askquestion('File Explorer', 'Are you sure to send {} to {}?'.format(file_name, peername),
                                                  icon="question")
             if msg_box == 'yes':
                 sf_t = threading.Thread(
@@ -613,7 +622,7 @@ class NetworkPeer(Base):
                 sf_t.daemon = True
                 sf_t.start()
                 tkinter.messagebox.showinfo(
-                    "File Transfer", '{} đã được gửi đến user: {}!'.format(file_name, peername))
+                    "File Transfer", '{} has been sent to {}!'.format(file_name, peername))
             else:
                 self.client_send((host, port), msgtype='FILE_REFUSE', msgdata={})
 
@@ -624,13 +633,13 @@ class NetworkPeer(Base):
         peername = msgdata['peername']
         host = msgdata['host']
         port = msgdata['port']
-        display_noti("Thông báo",
-                     "Yêu cầu file được chấp nhận!")
+        display_noti("Kết quả yêu cầu file",
+                     "Chấp nhận!")
         self.friendlist[peername] = (host, port)
 
     def file_refuse(self, msgdata):
         """ Processing received refuse chat request message from peer. """
-        display_noti("Thông báo", 'Yêu cầu file bị từ chối!')
+        display_noti("Kết quả yêu cầu file", 'FILE REFUSED!')
     ## ===========================================================##
     
     def recv_public_message(self, msgdata):
@@ -665,7 +674,7 @@ class NetworkPeer(Base):
         try:
             peer_info = self.friendlist[peer]
         except KeyError:
-            display_noti("Thông báo", 'Người này không tồn tại!')
+            display_noti("File Transfer Result", 'Friend does not exist!')
         else:
             file_name = os.path.basename(file_path)
             def fileThread(filename):
@@ -700,7 +709,7 @@ class NetworkPeer(Base):
 
                 # Close the file socket
                 file_sent.close()
-                display_noti("Thông báo", 'File đã được gửi!')
+                display_noti("File Transfer Result", 'File has been sent!')
                 return
             t_sf = threading.Thread(target=fileThread,args=(file_name,))
             t_sf.daemon = True
@@ -748,7 +757,7 @@ class NetworkPeer(Base):
             conn.close()
 
             # Display a notification
-            display_noti("Thông báo", f'Bạn đã nhận được một file với tên "{file_name}" từ "{friend_name}"')
+            display_noti("File Transfer Result", f'You received a file with name {file_name} from {friend_name}')
 
     ## ===========================================================##
     
