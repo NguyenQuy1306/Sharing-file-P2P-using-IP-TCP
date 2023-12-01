@@ -1,7 +1,6 @@
-import socket
 from threading import Thread
 from Base import Base
-from persistence import *
+from model import *
 import customtkinter
 import tkinter.messagebox
 from tkinter import ttk
@@ -58,14 +57,14 @@ class App(customtkinter.CTk):
         # customtkinter.CTk.__init__(self, *args, **kwargs)
 
         # configure windows
-        self.title("P2P Server")
+        self.title("Upload files service")
         self.geometry(f"{1100}x{580}")
         self.configure(bg="red")
         # configure grid layout (3x?)
         
 
         # create sidebar frame with widgets
-        self.sidebar_frame = ttk.Label(self, width=140, text="P2P server",font=('Arial', 25),foreground="#3F72AF")  
+        self.sidebar_frame = ttk.Label(self, width=140, text="Upload files service",font=('Arial', 25),foreground="#3F72AF")  
         self.sidebar_frame.grid(column=0, row=0, sticky=tkinter.W, padx=5, pady=5)
         # self.sidebar_frame.grid(row=0, column=0, rowspan=1,  padx=(10,0),pady=(10,0),sticky="nsew"),
         # self.sidebar_frame.grid_rowconfigure(1, weight=1)

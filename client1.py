@@ -11,7 +11,7 @@ import sys
 import platform
 import shutil
 from Base import Base
-import persistence
+import model
  
 # GUI
 import tkinter as tk
@@ -26,7 +26,6 @@ from flask import Flask
 
 # aid
 from hashfunction import MD5_hash
-import asset
 
 # ----CONSTANT----#
 FORMAT = "utf-8"
@@ -81,7 +80,7 @@ class StartPage(tk.Frame):
         # set color mode
         customtkinter.set_default_color_theme("blue")
         # create title
-        self.page_title = customtkinter.CTkLabel(self, text="P2P File Sharing", font=("Arial Bold", 36))
+        self.page_title = customtkinter.CTkLabel(self, text="File transfer service", font=("Arial Bold", 36))
         self.page_title.pack(padx=10, pady=(80, 10))
         # set port label
         self.port_label = customtkinter.CTkLabel(self, text="Nhập giá trị port trong khoảng (1024 -> 65535)", font=("Arial", 20))
@@ -242,6 +241,10 @@ class RepoPage(tk.Frame):
         # create reload repo button
         self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
         self.update_button.grid(row=3, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
+
+        self.greeting_label_var = tk.StringVar()
+        self.greeting_label = customtkinter.CTkLabel(master=self.temp_frame, textvariable=self.greeting_label_var, font=("Roboto", 14))
+        self.greeting_label.grid(row=4, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
 
         ####
@@ -505,6 +508,7 @@ class NetworkPeer(Base):
         app.geometry("1100x600")
         app.resizable(False, False)
         app.show_frame(RepoPage)
+        app.frames[RepoPage].update_user_greeting(self.name)
 
     def login_error(self, msgdata):
         """ Processing received message from server: Login failed on the server. """
@@ -547,7 +551,7 @@ class NetworkPeer(Base):
 
     def reloadRepoList(self):
         fileList = []
-        fileList = persistence.get_user_file(self.name)
+        fileList = model.get_user_file(self.name)
         for file in fileList:
             app.frames[RepoPage].fileListBox.insert(0,file)
 
@@ -786,7 +790,7 @@ class NetworkPeer(Base):
 # ------ app run ---------- #
 if __name__ == "__main__":
     app = tkinterApp()
-    app.title('P2P File Sharing')
+    app.title('File transfer service')
     app.geometry("1024x600")
     app.resizable(False, False)
 

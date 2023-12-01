@@ -7,7 +7,7 @@ import socket
 import threading
 import shutil
 from Base import Base
-import persistence
+import model
  
 # GUI
 import tkinter as tk
@@ -76,7 +76,7 @@ class StartPage(tk.Frame):
         # set color modepython
         customtkinter.set_default_color_theme("blue")
         # create title
-        self.page_title = customtkinter.CTkLabel(self, text="P2P File Sharing", font=("Arial Bold", 36))
+        self.page_title = customtkinter.CTkLabel(self, text="File sharing service", font=("Arial Bold", 36))
         self.page_title.pack(padx=10, pady=(80, 10))
         # set port label
         self.port_label = customtkinter.CTkLabel(self, text="Nhập giá trị port trong khoảng (1024 -> 65535)", font=("Arial", 20))
@@ -237,6 +237,10 @@ class RepoPage(tk.Frame):
         # create reload repo button
         self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
         self.update_button.grid(row=3, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
+        
+        self.greeting_label_var = tk.StringVar()
+        self.greeting_label = customtkinter.CTkLabel(master=self.temp_frame, textvariable=self.greeting_label_var, font=("Roboto", 14))
+        self.greeting_label.grid(row=4, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
 
         ####
@@ -270,11 +274,17 @@ class RepoPage(tk.Frame):
         #create CLI
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
         self.entry.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        pcommand_entry = customtkinter.CTkEntry(self)
-        self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
+        # pcommand_entry = customtkinter.CTkEntry(self)
+        self.main_button_1 = customtkinter.CTkButton(self, text="Enter", command = lambda:self.commandLine(command = self.entry.get()), fg_color="#192655", border_width=2)
+        #self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
         self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
+    def update_user_greeting(self, username):
+        """Cập nhật nhãn chào mừng với tên người dùng."""
+        greeting = f"Xin chào, {username}!"
+        print(greeting)
+        self.greeting_label_var.set(greeting)
 
     def logout_user(self):
         network_peer.send_logout_request()
@@ -498,6 +508,7 @@ class NetworkPeer(Base):
         app.geometry("1100x600")
         app.resizable(False, False)
         app.show_frame(RepoPage)
+        app.frames[RepoPage].update_user_greeting(self.name) 
 
     def login_error(self, msgdata):
         """ Processing received message from server: Login failed on the server. """
@@ -540,7 +551,7 @@ class NetworkPeer(Base):
 
     def reloadRepoList(self):
         fileList = []
-        fileList = persistence.get_user_file(self.name)
+        fileList = model.get_user_file(self.name)
         for file in fileList:
             app.frames[RepoPage].fileListBox.insert(0,file)
 
