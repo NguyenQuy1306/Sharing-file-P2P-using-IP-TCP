@@ -11,7 +11,7 @@ import sys
 import platform
 import shutil
 from Base import Base
-import persistence
+import model
  
 # GUI
 import tkinter as tk
@@ -128,12 +128,7 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         customtkinter.set_appearance_mode("light")
-        customtkinter.set_default_color_theme("blue")
-        # Sign Up Image
-        # signup_pic = ImageTk.PhotoImage(asset.signup_image)
-        # self.signupImg = tkinter.Label(self, image=signup_pic, bg='white')
-        # self.signupImg.image = signup_pic
-        # self.signupImg.place(x=50, y=50)        
+        customtkinter.set_default_color_theme("blue")       
 
         self.frame = customtkinter.CTkFrame(master=self, fg_color="white")
         self.frame.pack(fill='both', expand=True)
@@ -169,11 +164,7 @@ class RegisterPage(tk.Frame):
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        # Login Image
-        # login_pic = ImageTk.PhotoImage(asset.login_image)
-        # loginImg = tkinter.Label(self, image=login_pic)
-        # loginImg.image = login_pic
-        # loginImg.place(x=50, y=50)
+
         self.frame = customtkinter.CTkFrame(master=self, fg_color="white")
         self.frame.pack(fill='both', expand=True)
 
@@ -230,9 +221,6 @@ class RepoPage(tk.Frame):
         # create temp frame
         self.temp_frame = customtkinter.CTkFrame(master=self.repo_frame, fg_color="transparent")
         self.temp_frame.grid(row=0, column=1, sticky="nsew")
-        # self.temp_frame.grid_rowconfigure(0, weight=1)
-        # self.temp_frame.grid_columnconfigure(0, weight=1)
-        # self.temp_frame.grid_columnconfigure(1, weight=1)
         # create delete button
         self.delete_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Xóa file", fg_color="#192655",command=lambda: self.deleteSelectedFile())
         self.delete_button.grid(row=0, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
@@ -265,11 +253,6 @@ class RepoPage(tk.Frame):
         self.peerListBox = tk.Listbox(self.scrollable_peer_frame, width=175, height=20)
         self.peerListBox.grid(row=0, column=1, padx=10, pady=(10, 10))
         # # ####
-        #  29/11
-        # self.search_frame = customtkinter.CTkFrame(self.peer_frame, fg_color="#DBE2EF")
-        # self.search_frame.grid(row=2, column=6, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        # self.search_frame.grid_rowconfigure(0, weight=1)
-        # self.search_frame.grid_columnconfigure(0, weight=1)
         self.search_entry = customtkinter.CTkEntry(master=self.peer_frame, placeholder_text="Search...")
         self.search_entry.grid(row=4, column=2,padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.search_button = customtkinter.CTkButton(master=self.peer_frame, text="Search", border_width=2, command=lambda: self.get_users_share_file_from_entry(),fg_color="#192655")
@@ -282,7 +265,7 @@ class RepoPage(tk.Frame):
         #create CLI
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
         self.entry.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
+        self.main_button_1 = customtkinter.CTkButton(self, text="Enter", command = lambda:self.commandLine(command = self.entry.get()), fg_color="#192655", border_width=2)
         self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
@@ -561,18 +544,9 @@ class NetworkPeer(Base):
 
     def reloadRepoList(self):
         fileList = []
-        fileList = persistence.get_user_file(self.name)
+        fileList = model.get_user_file(self.name)
         for file in fileList:
             app.frames[RepoPage].fileListBox.insert(0,file)
-
-    # def not_get_users_share_file(self, msgdata):
-    #     """ Processing received message from server:
-    #         Output username of all peers that have file which client is finding."""
-    #     self.connectable_peer.clear()
-    #     for key, value in msgdata['online_user_list_have_file'].items():
-    #         self.connectable_peer[key] = tuple(value)
-    #     if self.name in self.connectable_peer:
-    #         self.connectable_peer.pop(self.name)
 
     ## ===========================================================##
 
@@ -596,7 +570,7 @@ class NetworkPeer(Base):
         peername = msgdata['peername']
         host, port = msgdata['host'], msgdata['port']
         filename = msgdata['filename']
-        msg_box = tkinter.messagebox.askquestion('File Request', '{} - {}:{} request to take the file "{}"?'.format(peername, host, port, filename),
+        msg_box = tkinter.messagebox.askquestion('File Request', 'User: {} - host {}: port: {} yêu cầu gửi file "{}"?'.format(peername, host, port, filename),
                                             icon="question")
         if msg_box == 'yes':
             # if request is agreed, connect to peer (add to friendlist)
@@ -614,7 +588,7 @@ class NetworkPeer(Base):
                                                        title="Select a File",
                                                        filetypes=(("All files", "*.*"),))
             file_name = os.path.basename(file_path)
-            msg_box = tkinter.messagebox.askquestion('File Explorer', 'Are you sure to send {} to {}?'.format(file_name, peername),
+            msg_box = tkinter.messagebox.askquestion('File Explorer', 'Bạn có chắc muốn gửi file {} đến user: {}?'.format(file_name, peername),
                                                  icon="question")
             if msg_box == 'yes':
                 sf_t = threading.Thread(
@@ -622,7 +596,7 @@ class NetworkPeer(Base):
                 sf_t.daemon = True
                 sf_t.start()
                 tkinter.messagebox.showinfo(
-                    "File Transfer", '{} has been sent to {}!'.format(file_name, peername))
+                    "File Transfer", '{} đã được gửi đến user: {}!'.format(file_name, peername))
             else:
                 self.client_send((host, port), msgtype='FILE_REFUSE', msgdata={})
 
@@ -633,8 +607,8 @@ class NetworkPeer(Base):
         peername = msgdata['peername']
         host = msgdata['host']
         port = msgdata['port']
-        display_noti("Kết quả yêu cầu file",
-                     "Chấp nhận!")
+        display_noti("Thông báo",
+                     "Yêu cầu file được chấp nhận!")
         self.friendlist[peername] = (host, port)
 
     def file_refuse(self, msgdata):
@@ -650,22 +624,6 @@ class NetworkPeer(Base):
         app.chatroom_textCons.insert(tkinter.END, message+"\n\n")
         app.chatroom_textCons.config(state=tkinter.DISABLED)
         app.chatroom_textCons.see(tkinter.END)
-    ## ===========================================================##
-
-    # def recv_message(self, msgdata):
-    #     """ Processing received chat message from peer."""
-    #     friend_name = msgdata['friend_name']
-    #     if friend_name in self.friendlist:
-    #         # insert messages to text box
-    #         message = friend_name + ": " + msgdata['message']
-    #         app.frames[ChatPage].frame_list[friend_name].message_area.config(
-    #             state=tk.NORMAL)
-    #         app.frames[ChatPage].frame_list[friend_name].message_area.insert(
-    #             tk.END, message+"\n\n")
-    #         app.frames[ChatPage].frame_list[friend_name].message_area.config(
-    #             state=tk.DISABLED)
-    #         app.frames[ChatPage].frame_list[friend_name].message_area.see(
-    #             tk.END)
     ## ===========================================================##
 
     ## ==========implement protocol for file tranfering==========##
@@ -709,7 +667,7 @@ class NetworkPeer(Base):
 
                 # Close the file socket
                 file_sent.close()
-                display_noti("File Transfer Result", 'File has been sent!')
+                display_noti("Thông báo", 'File đã được gửi!')
                 return
             t_sf = threading.Thread(target=fileThread,args=(file_name,))
             t_sf.daemon = True
@@ -757,7 +715,7 @@ class NetworkPeer(Base):
             conn.close()
 
             # Display a notification
-            display_noti("File Transfer Result", f'You received a file with name {file_name} from {friend_name}')
+            display_noti("Thông báo", f'Bạn đã nhận được một file với tên {file_name} từ {friend_name}')
 
     ## ===========================================================##
     
