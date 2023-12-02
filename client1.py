@@ -5,10 +5,6 @@ import os
 import json
 import socket
 import threading
-import time
-import random
-import sys
-import platform
 import shutil
 from Base import Base
 import model
@@ -19,10 +15,8 @@ import tkinter.messagebox
 import tkinter.filedialog
 from tkinter import simpledialog
 import tkinter.ttk as ttk
-from PIL import ImageTk 
-from PIL import Image
 import customtkinter
-from flask import Flask
+
 
 # aid
 from hashfunction import MD5_hash
@@ -274,14 +268,21 @@ class RepoPage(tk.Frame):
         self.request_button = customtkinter.CTkButton(master=self.peer_frame, border_width=2,
                                                      command=lambda:self.fileRequest(), text="Gửi yêu cầu kết nối",fg_color="#192655")
         self.request_button.grid(row=6, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        pcommand_entry = customtkinter.CTkEntry(self)   
+        
         #create CLI
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
         self.entry.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
+        self.main_button_1 = customtkinter.CTkButton(self, text="Enter", command = lambda:self.commandLine(command = self.entry.get()), fg_color="#192655", border_width=2)
         self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
+
+
+    def update_user_greeting(self, username):
+        """Cập nhật nhãn chào mừng với tên người dùng."""
+        greeting = f"Xin chào, {username}!"
+        print(greeting)
+        self.greeting_label_var.set(greeting)
 
     def logout_user(self):
         network_peer.send_logout_request()

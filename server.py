@@ -71,33 +71,15 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure((1), weight=1)
         self.grid_rowconfigure(1, weight=1)
-        # self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"),anchor="center")
-        # self.logo_label.grid(row=0, column=0, padx=(240,20), pady=(20, 10),sticky="nsew", columnspan=2, rowspan=2)
-        
-        #self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655",font=customtkinter.CTkFont(size=15, weight="bold"))
-        #self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
-
-        # change appearance mode
-        # self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
-        # self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        # self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
-        #                                                                command=self.change_appearance_mode_event)
-        # self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-
-        # # change scaling
-        # self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        # self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        # self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
-        #                                                        command=self.change_scaling_event)
-        # self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
-
         # create scrollable frame for clients list
         ## to do: add clients to this frame
+      
         self.scrollable_clients_frame = customtkinter.CTkScrollableFrame(self, label_text="Clients",fg_color="#DBE2EF",label_text_color="#3F72AF",label_font=("Clients",25))
         self.scrollable_clients_frame.grid(row = 1, column = 0, columnspan = 2, rowspan=4, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.scrollable_clients_frame.grid_columnconfigure((0), weight=1)
         self.scrollable_clients_names = get_all_users()
         self.scrollable_clients_labels = []
+            
         ## to do: modify range to number of current clients
         for i, username in enumerate(self.scrollable_clients_names):
             client_label = customtkinter.CTkLabel(master=self.scrollable_clients_frame, text=username)
@@ -184,7 +166,9 @@ class CentralServer(Base):
         super(CentralServer, self).__init__(serverhost, serverport)
 
         # get registered user list
+        
         self.peerList = get_all_users()
+            
 
         # manage online user list
         self.onlineList = {} 
@@ -331,8 +315,10 @@ app.protocol("WM_DELETE_WINDOW", handle_on_closing_event)
 #     server = CentralServer()
 #     server.input_recv()
 def run_server():
+    
     server = CentralServer()
     server.input_recv()
+        
 
 if __name__ == '__main__':
     app = App()
