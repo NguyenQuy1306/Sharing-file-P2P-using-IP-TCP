@@ -1,3 +1,5 @@
+Nhánh này chỉ để test, fix bug và thử nghiệm
+
 # BTL-1-MMT
 
 ## Bước 1: Tải mã nguồn từ github về máy bằng lệnh git clone
