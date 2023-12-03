@@ -1,6 +1,6 @@
 # BTL-1-MMT
 
-## Bước 1: Tải mã nguồn từ github về máy bằng lệnh git clone tại branch VH
+## Bước 1: Tải mã nguồn từ github về máy bằng lệnh git clone tại branch master
  #### • git clone https://github.com/NguyenQuy1306/BTL-1-MMT.git
 ##  Bước 2: Khởi động server:
   #### • python central_server.py server_port
