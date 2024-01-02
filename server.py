@@ -1,12 +1,9 @@
-import socket
 from threading import Thread
 from Base import Base
-from persistence import *
+from model import *
 import customtkinter
 import tkinter.messagebox
 from tkinter import ttk
-
-customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
 # popup notification
@@ -60,47 +57,29 @@ class App(customtkinter.CTk):
         # customtkinter.CTk.__init__(self, *args, **kwargs)
 
         # configure windows
-        self.title("P2P Server")
+        self.title("Upload files service")
         self.geometry(f"{1100}x{580}")
         self.configure(bg="red")
         # configure grid layout (3x?)
         
 
         # create sidebar frame with widgets
-        self.sidebar_frame = ttk.Label(self, width=140, text="P2P server",font=('Arial', 25),foreground="#3F72AF")  
+        self.sidebar_frame = ttk.Label(self, width=140, text="Upload files service",font=('Arial', 25),foreground="#3F72AF")  
         self.sidebar_frame.grid(column=0, row=0, sticky=tkinter.W, padx=5, pady=5)
         # self.sidebar_frame.grid(row=0, column=0, rowspan=1,  padx=(10,0),pady=(10,0),sticky="nsew"),
         # self.sidebar_frame.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure((1), weight=1)
         self.grid_rowconfigure(1, weight=1)
-        # self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="P2P Server", font=customtkinter.CTkFont(size=20, weight="bold"),anchor="center")
-        # self.logo_label.grid(row=0, column=0, padx=(240,20), pady=(20, 10),sticky="nsew", columnspan=2, rowspan=2)
-        
-        #self.sidebar_button = customtkinter.CTkButton(self.sidebar_frame, text="Thoát", command=self.sidebar_button_event,fg_color="#192655",font=customtkinter.CTkFont(size=15, weight="bold"))
-        #self.sidebar_button.grid(row=1, column=0, padx=20, pady=10)
-
-        # change appearance mode
-        # self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
-        # self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        # self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
-        #                                                                command=self.change_appearance_mode_event)
-        # self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-
-        # # change scaling
-        # self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        # self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        # self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
-        #                                                        command=self.change_scaling_event)
-        # self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
-
         # create scrollable frame for clients list
         ## to do: add clients to this frame
+      
         self.scrollable_clients_frame = customtkinter.CTkScrollableFrame(self, label_text="Clients",fg_color="#DBE2EF",label_text_color="#3F72AF",label_font=("Clients",25))
         self.scrollable_clients_frame.grid(row = 1, column = 0, columnspan = 2, rowspan=4, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.scrollable_clients_frame.grid_columnconfigure((0), weight=1)
         self.scrollable_clients_names = get_all_users()
         self.scrollable_clients_labels = []
+            
         ## to do: modify range to number of current clients
         for i, username in enumerate(self.scrollable_clients_names):
             client_label = customtkinter.CTkLabel(master=self.scrollable_clients_frame, text=username)
@@ -126,8 +105,6 @@ class App(customtkinter.CTk):
         self.main_button_2 = customtkinter.CTkButton(master=self, text="Thoát", command=self.sidebar_button_event, fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=2, padx=(10, 10), pady=(10, 20), sticky="nsew")
         
-    def change_appearance_mode_event(self, new_appearance_mode: str):
-        customtkinter.set_appearance_mode(new_appearance_mode)
 
     def change_scaling_event(self, new_scaling: str):
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
@@ -189,7 +166,9 @@ class CentralServer(Base):
         super(CentralServer, self).__init__(serverhost, serverport)
 
         # get registered user list
+        
         self.peerList = get_all_users()
+            
 
         # manage online user list
         self.onlineList = {} 
@@ -336,8 +315,10 @@ app.protocol("WM_DELETE_WINDOW", handle_on_closing_event)
 #     server = CentralServer()
 #     server.input_recv()
 def run_server():
+    
     server = CentralServer()
     server.input_recv()
+        
 
 if __name__ == '__main__':
     app = App()

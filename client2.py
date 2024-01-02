@@ -71,10 +71,10 @@ class tkinterApp(tk.Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        # set color modepython
+        # set color mode
         customtkinter.set_default_color_theme("blue")
         # create title
-        self.page_title = customtkinter.CTkLabel(self, text="File sharing service", font=("Arial Bold", 36))
+        self.page_title = customtkinter.CTkLabel(self, text="File transfer service", font=("Arial Bold", 36))
         self.page_title.pack(padx=10, pady=(80, 10))
         # set port label
         self.port_label = customtkinter.CTkLabel(self, text="Nhập giá trị port trong khoảng (1024 -> 65535)", font=("Arial", 20))
@@ -235,7 +235,7 @@ class RepoPage(tk.Frame):
         # create reload repo button
         self.update_button = customtkinter.CTkButton(master=self.temp_frame, border_width=2, text="Reload repository", fg_color="#192655",command=lambda: self.reloadRepo())
         self.update_button.grid(row=3, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
-        
+
         self.greeting_label_var = tk.StringVar()
         self.greeting_label = customtkinter.CTkLabel(master=self.temp_frame, textvariable=self.greeting_label_var, font=("Roboto", 14))
         self.greeting_label.grid(row=4, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
@@ -268,18 +268,16 @@ class RepoPage(tk.Frame):
         self.request_button = customtkinter.CTkButton(master=self.peer_frame, border_width=2,
                                                      command=lambda:self.fileRequest(), text="Gửi yêu cầu kết nối",fg_color="#192655")
         self.request_button.grid(row=6, column=2, padx=(10, 10), pady=(10, 10), sticky="nsew")
-
+        
         #create CLI
         self.entry = customtkinter.CTkEntry(self, placeholder_text="Command...")
         self.entry.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
-
-        # pcommand_entry = customtkinter.CTkEntry(self)
         self.main_button_1 = customtkinter.CTkButton(self, text="Enter", command = lambda:self.commandLine(command = self.entry.get()), fg_color="#192655", border_width=2)
-        #self.main_button_1 = customtkinter.CTkButton(self, text="Enter",command=lambda:self.commandLine(command = pcommand_entry.get()), border_width=2, fg_color="#192655")
-
         self.main_button_1.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="nsew")
         self.main_button_2 = customtkinter.CTkButton(self, text="Thoát", command=lambda: self.quit_user(), fg_color="#192655", border_width=2,font=customtkinter.CTkFont(size=15, weight="bold"))
         self.main_button_2.grid(row=4, column=3, padx=(10, 10), pady=(10, 10), sticky="nsew")
+
+
     def update_user_greeting(self, username):
         """Cập nhật nhãn chào mừng với tên người dùng."""
         greeting = f"Xin chào, {username}!"
@@ -342,9 +340,9 @@ class RepoPage(tk.Frame):
             
     def sendtoLocalPath(self, file_path):
         # create a folder named "repo" in this folder
-        if not os.path.exists("localRepo"):
-            os.makedirs("localRepo")
-        destination = os.path.join(os.getcwd(), "localRepo")
+        if not os.path.exists("localRepo2"):
+            os.makedirs("localRepo2")
+        destination = os.path.join(os.getcwd(), "localRepo2")
         shutil.copy(file_path, destination)
 
     def sendtoServerPath(self, file_path):
@@ -366,13 +364,13 @@ class RepoPage(tk.Frame):
             # popup = simpledialog.askstring("Input","Nhập tên file trên Localrepo",parent = self)
             self.fileListBox.insert(0,file_name)
             tkinter.messagebox.showinfo(
-                "Local Repository", '{} has been added to localRepo!'.format(file_name))
+                "Local Repository", '{} has been added to localrepo2!'.format(file_name))
             self.sendtoLocalPath(file_name)
             
     def chooseFilefromPath(self, file_path):
             self.fileListBox.insert(0,file_path)
             tkinter.messagebox.showinfo(
-                "Local Repository", '{} has been added to localRepo!'.format(file_path))
+                "Local Repository", '{} has been added to localrepo2!'.format(file_path))
             
     def fileRequest(self):
         peer_info = self.peerListBox.get(tk.ANCHOR)
@@ -410,7 +408,7 @@ class RepoPage(tk.Frame):
     def reloadRepo(self):
         for file in self.fileListBox.get(0, tk.END):
             self.fileListBox.delete(0, tk.END)
-        path = os.path.join(os.getcwd(), "localRepo")
+        path = os.path.join(os.getcwd(), "localRepo2")
         for filename in os.listdir(path):
             file_path = os.path.join(path, filename)
             self.fileListBox.insert(tk.END, file_path)
@@ -422,6 +420,9 @@ class RepoPage(tk.Frame):
 
     def listbox_callback(self):
         print("done")
+
+    def change_appearance_mode_event(self, new_appearance_mode: str):
+        customtkinter.set_appearance_mode(new_appearance_mode)
 
     def change_scaling_event(self, new_scaling: str):
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
@@ -508,7 +509,7 @@ class NetworkPeer(Base):
         app.geometry("1100x600")
         app.resizable(False, False)
         app.show_frame(RepoPage)
-        app.frames[RepoPage].update_user_greeting(self.name) 
+        app.frames[RepoPage].update_user_greeting(self.name)
 
     def login_error(self, msgdata):
         """ Processing received message from server: Login failed on the server. """
@@ -555,6 +556,16 @@ class NetworkPeer(Base):
         for file in fileList:
             app.frames[RepoPage].fileListBox.insert(0,file)
 
+    # def not_get_users_share_file(self, msgdata):
+    #     """ Processing received message from server:
+    #         Output username of all peers that have file which client is finding."""
+    #     self.connectable_peer.clear()
+    #     for key, value in msgdata['online_user_list_have_file'].items():
+    #         self.connectable_peer[key] = tuple(value)
+    #     if self.name in self.connectable_peer:
+    #         self.connectable_peer.pop(self.name)
+
+    ## ===========================================================##
 
     ## ==========implement protocol for file request==========##
     def send_request(self, peerinfo, filename):
@@ -634,6 +645,22 @@ class NetworkPeer(Base):
         app.chatroom_textCons.see(tkinter.END)
     ## ===========================================================##
 
+    # def recv_message(self, msgdata):
+    #     """ Processing received chat message from peer."""
+    #     friend_name = msgdata['friend_name']
+    #     if friend_name in self.friendlist:
+    #         # insert messages to text box
+    #         message = friend_name + ": " + msgdata['message']
+    #         app.frames[ChatPage].frame_list[friend_name].message_area.config(
+    #             state=tk.NORMAL)
+    #         app.frames[ChatPage].frame_list[friend_name].message_area.insert(
+    #             tk.END, message+"\n\n")
+    #         app.frames[ChatPage].frame_list[friend_name].message_area.config(
+    #             state=tk.DISABLED)
+    #         app.frames[ChatPage].frame_list[friend_name].message_area.see(
+    #             tk.END)
+    ## ===========================================================##
+
     ## ==========implement protocol for file tranfering==========##
     def transfer_file(self, peer, file_path, file_name_server):
         """ Transfer a file. """
@@ -660,8 +687,8 @@ class NetworkPeer(Base):
                 msg = file_sent.recv(BUFFER_SIZE).decode(FORMAT)
                 print(msg)
 
-                # Change the path to localRepo
-                localRepo_path = os.path.join(os.getcwd(), "localRepo")
+                # Change the path to localRepo2
+                localRepo_path = os.path.join(os.getcwd(), "localRepo2")
                 file_path = os.path.join(localRepo_path, filename)
 
                 # Receive and save the file
@@ -702,7 +729,7 @@ class NetworkPeer(Base):
             file_name = recv_file_info['filename']
             friend_name = recv_file_info['friendname']
 
-            localRepo_path = os.path.join(os.getcwd(), "localRepo")
+            localRepo_path = os.path.join(os.getcwd(), "localRepo2")
             file_path = os.path.join(localRepo_path, file_name)
 
             # Open the file with the correct path for writing binary data
@@ -764,7 +791,7 @@ class NetworkPeer(Base):
 # ------ app run ---------- #
 if __name__ == "__main__":
     app = tkinterApp()
-    app.title('P2P File Sharing')
+    app.title('File transfer service')
     app.geometry("1024x600")
     app.resizable(False, False)
 
