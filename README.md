@@ -1,7 +1,9 @@
 # BTL-1-MMT
 
-## Bước 1: Tải mã nguồn từ github về máy bằng lệnh git clone tại branch master(bản cuối)
- #### • git clone -b master https://github.com/NguyenQuy1306/BTL-1-MMT.git
+
+## Bước 1: Tải mã nguồn từ github về máy bằng lệnh git clone tại branch main
+ #### • git clone https://github.com/NguyenQuy1306/BTL-1-MMT.git
+ 
 ##  Bước 2: Khởi động server:
   #### • python server.py 
 ##  Bước 3: Thay đổi địa chỉ IP :
